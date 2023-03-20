@@ -1,0 +1,7 @@
+Disciplina,Turma,Nome,Dia,Início,Fim
+GAC108,10A,Estruturas de Dados,Terça-Feira,50,200
+GAC108,19A,Estruturas de Dados,Quarta-Feira,300,450
+GES101,15B,Estatística,Segunda-Feira,30,180
+GES101,10B,Estatística,Segunda-Feira,10,160
+GES101,10B,Estatística,Sexta-Feira,250,400
+GES101,15B,Estatística,Sexta-Feira,250,400
