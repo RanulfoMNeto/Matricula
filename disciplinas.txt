@@ -5,3 +5,6 @@ GES101,15B,Estatística,Segunda-Feira,30,180
 GES101,10B,Estatística,Segunda-Feira,10,160
 GES101,10B,Estatística,Sexta-Feira,250,400
 GES101,15B,Estatística,Sexta-Feira,250,400
+GDI116,12B,Direito Penal,Quarta-Feira,200,350
+GCC130,10A,Compiladores,Quinta-Feira,20,300
+GCC130,10A,Compiladores,Sexta-Feira,300,450

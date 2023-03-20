@@ -18,6 +18,13 @@ class NodeNotFound : public exception {
         } 
 };
 
+class EdgeNotFound : public exception {
+    public:
+        virtual const char* what() const throw() { 
+            return "Edge not found"; 
+        } 
+};
+
 class ClassNotFound : public exception {
     public:
         virtual const char* what() const throw() { 
@@ -25,31 +32,38 @@ class ClassNotFound : public exception {
         } 
 };
 
-class Codigo {
+class CodeNotFound : public exception {
+    public:
+        virtual const char* what() const throw() { 
+            return "Code not found"; 
+        } 
+};
+
+class Code {
 	public:
 		string disciplina;
 		string turma;
-		Codigo() {};
-		Codigo(string disciplina, string turma) {
+		Code() {};
+		Code(string disciplina, string turma) {
 			this->disciplina = disciplina;
 			this->turma = turma;
 		}
-		bool operator==(Codigo codigo) {  
-			return (disciplina == codigo.disciplina) and (turma == codigo.turma);
+		bool operator==(Code code) {  
+			return (disciplina == code.disciplina) and (turma == code.turma);
 		}
 };
 
 class Node {
 	public:
-		Codigo codigo;
+		Code code;
 		string nome;
 		string dia;
 		int inicio;
 		int fim;
 		Node() {};
 
-		Node(Codigo codigo, string nome, string dia, int inicio, int fim) {
-			this->codigo = codigo;
+		Node(Code code, string nome, string dia, int inicio, int fim) {
+			this->code = code;
 			this->nome = nome;
 			this->dia = dia;
 			this->inicio = inicio;
@@ -57,7 +71,7 @@ class Node {
 		}
 
 		bool operator==(Node node) {  
-			return codigo == node.codigo;
+			return code == node.code;
 		}
 };
 
@@ -73,42 +87,63 @@ class Edge {
 
 class Class {
 	public:
-		Codigo codigo;
+		Code code;
 		vector<Node*> T;
-		Class (Codigo codigo) {
-			this->codigo = codigo;
+		Class (Code code) {
+			this->code = code;
 		}
 		void add(Node &node) {
 			T.push_back(&node);
 		}
 };
+typedef vector<Code> vc;
+typedef pair<Code,vc> cvc;
+typedef vector<cvc> vcvc;
+
+bool degreePriority(ii p1, ii p2) {
+	return p1.second > p2.second;
+}
 
 class Graph {
 	public:
 		vector<Node> V; // Conjunto de vértices (Coleta U Entrega U Depósito)
 		vector<Class> C;
 		vector<Edge> E;
-		vi AL;
+		vcvc AL;
+		vvi ALi;
 
-		Node& searchNodeByCode(Codigo codigo) {
+		Class& searchClassByIndex(int index) {
+			return C[index];
+			throw ClassNotFound();
+		}
+
+		Node& searchNodeByCode(Code code) {
 			for (int i = 0; i < V.size(); i++) {
-				if (V[i].codigo == codigo)
+				if (V[i].code == code)
 					return V[i];
 			}
 			throw NodeNotFound();
 		}
 
-		Class& searchClassByCode(Codigo codigo) {
+		Edge& searchEdgeByCode(Code code1, Code code2) {
+			for (int i = 0; i < E.size(); i++) {
+				if ((E[i].origem->code == code1) and (E[i].destino->code == code2))
+					return E[i];
+			}
+			throw EdgeNotFound();
+		}
+
+		Class& searchClassByCode(Code code) {
 			for (int i = 0; i < C.size(); i++) {
-				if (C[i].codigo == codigo)
+				if (C[i].code == code)
 					return C[i];
 			}
 			throw ClassNotFound();
 		}
 
 		void addNode(string disciplina, string turma, string nome, string dia, int inicio, int fim) {
-			Codigo codigo(disciplina, turma);
-            Node vertice(codigo, nome, dia, inicio, fim);
+			Code code(disciplina, turma);
+            Node vertice(code, nome, dia, inicio, fim);
             V.push_back(vertice);
         }
 
@@ -119,10 +154,10 @@ class Graph {
 		void groupClassByCode() {
 			for(int i = 0; i < V.size(); i++) {
 				try {
-					searchClassByCode(V[i].codigo).add(V[i]);
+					searchClassByCode(V[i].code).add(V[i]);
 				} catch (ClassNotFound cnf) {
-					C.push_back(V[i].codigo);
-					searchClassByCode(V[i].codigo).add(V[i]);
+					C.push_back(V[i].code);
+					searchClassByCode(V[i].code).add(V[i]);
 				}
 			}
 		}
@@ -133,23 +168,21 @@ class Graph {
 			// Turmas que possuem a mesma disciplina (externo)
 			for (int i = 0; i < C.size(); i++) {
 				for (int j = 0; (j < C.size()) and (j != i); j++) {
-					if (C[i].codigo.disciplina == C[j].codigo.disciplina) {
+					if (C[i].code.disciplina == C[j].code.disciplina) {
 						for (int m = 0; m < C[i].T.size(); m++) {
 							for (int n = 0; n < C[j].T.size(); n++) {
-								addEdge(*C[i].T[m], *C[j].T[n]);
-								//addEdge(*C[j].T[m], *C[i].T[n]);
+								try {
+									searchEdgeByCode(C[i].code, C[j].code);
+								} catch (EdgeNotFound enf) {
+									try {
+										searchEdgeByCode(C[j].code, C[i].code);
+									} catch (EdgeNotFound enf) {
+										addEdge(*C[i].T[m], *C[j].T[n]);
+										addEdge(*C[j].T[n], *C[i].T[m]);
+									}
+								}
 							}
 						}
-					}
-				}
-			}
-
-			// Turmas que possuem o mesmo código(disciplina e turma) (interno)
-			for (int i = 0; i < C.size(); i++) {
-				for (int j = 0; j < C[i].T.size(); j++) {
-					for (int m = 0; (m < C[i].T.size()) and (m != j); m++) {
-						addEdge(*C[i].T[j], *C[i].T[m]);
-						//addEdge(*C[i].T[m], *C[i].T[j]);
 					}
 				}
 			}
@@ -172,11 +205,20 @@ class Graph {
 						}
 					}
 					if (conflict) {
-						for (int m = 0; m < C[i].T.size(); m++) {
-							for (int n = 0; n < C[j].T.size(); n++) {
-								addEdge(*C[i].T[m], *C[j].T[n]);
-								//addEdge(*C[j].T[m], *C[i].T[n]);
+						try {
+							searchEdgeByCode(C[i].code, C[j].code);
+						} catch (EdgeNotFound enf) {
+							try {
+								searchEdgeByCode(C[j].code, C[i].code);
+							} catch (EdgeNotFound enf) {
+								for (int m = 0; m < C[i].T.size(); m++) {
+									for (int n = 0; n < C[j].T.size(); n++) {
+										addEdge(*C[i].T[m], *C[j].T[n]);
+										addEdge(*C[j].T[n], *C[i].T[m]);
+									}
+								}
 							}
+							
 						}
 					}
 				}
@@ -185,15 +227,104 @@ class Graph {
 
 		void printConflicts() {
 			for (int i = 0; i < E.size(); i++) {
-				cout << "(" << E[i].origem->codigo.disciplina << "," << E[i].origem->codigo.turma << ")" << E[i].origem->inicio << " | ";
-				cout << "(" << E[i].destino->codigo.disciplina << "," << E[i].destino->codigo.turma << ")" << E[i].destino->inicio << endl;
+				cout << "(" << E[i].origem->code.disciplina << "," << E[i].origem->code.turma << ")" << E[i].origem->inicio << " | ";
+				cout << "(" << E[i].destino->code.disciplina << "," << E[i].destino->code.turma << ")" << E[i].destino->inicio << endl;
 			}
 		}
 
+		cvc& searchALByCode(Code code) {
+			for (int i = 0; i < AL.size(); i++) {
+				if (AL[i].first == code)
+					return AL[i];
+			}
+			throw CodeNotFound();
+		}
+
+		int searchALIndexByCode(Code code) {
+			for (int i = 0; i < AL.size(); i++) {
+				if (AL[i].first == code)
+					return i;
+			}
+			throw CodeNotFound();
+		}
+
+		void adjacencyListGenerator() {
+			for (int i = 0; i < C.size(); i++) {
+				AL.push_back(cvc(C[i].code, vc()));
+			}
+
+			for (int i = 0; i < E.size(); i++) {
+				searchALByCode(E[i].origem->code).second.push_back(E[i].destino->code);
+			}
+		}
+
+		void convertAdjacencyList() {
+			ALi = vvi(AL.size());
+			for (int i = 0; i < AL.size(); i++) {
+				for (int j = 0; j < AL[i].second.size(); j++) {
+					ALi[i].push_back(searchALIndexByCode(AL[i].second[j]));
+				}
+			}
+		}
+
+		int degree(int u) {
+			return ALi[u].size();
+		}
+
+		vi sortNodesByDregree() {
+			vii aux;
+			for (int i = 0; i < ALi.size(); i++) {
+				aux.push_back(ii(i, degree(i))); // <id, degree>
+			}
+			sort(aux.begin(), aux.end(), degreePriority);
+			vi L;
+			for (int i = 0; i < aux.size(); i++) {
+				int v = aux[i].first;
+				L.push_back(v);
+			}
+			return L;
+		}
+
+		vi coloringHeuristic() {
+			// Seja L uma lista de vértices ordenada de forma descendente pelo grau;
+			vi L = sortNodesByDregree();
+			
+			// c ← 1;
+			int c = 1;
+			vi color(ALi.size(), -1);
+			
+			// while L ≠ ∅ do
+			while(!L.empty()) {
+				// for all v ∈ L tal que v não é colorido do
+				for (int i = 0; i < L.size(); i++) {
+					bool colored = false;
+					int v = L[i];
+					for (int j = 0; j < ALi[v].size(); j++) {
+						int u = ALi[v][j];
+						colored = (color[u] == c)?true:false;
+					}
+					// if nenhum vértice adjacente a v foi colorido com c then
+					if (!colored) {
+						// Colora v com a color c;
+						color[v] = c;
+					}
+				}
+				for (int i = 0; i < L.size(); i++) {
+					int v = L[i];
+					if (color[v] != -1) {
+						L.erase(L.begin()+i);
+						i--;
+					}
+				}
+				// c ← c + 1;
+				c++;
+			}
+			return color;
+		}
 };
 
-void lerArquivo(string nomeArquivo, Graph &graph) {
-    ifstream arquivo(nomeArquivo+".txt");
+void lerArquivo(string fileName, Graph &graph) {
+    ifstream arquivo(fileName+".txt");
     string linha;
 
     getline(arquivo, linha); // header
@@ -230,16 +361,20 @@ void lerArquivo(string nomeArquivo, Graph &graph) {
 }
 
 int main() {
-
-	string nomeArquivo = "disciplinas";
-	//cout << "Nome do arquivo: ";
-	//cin >> nomeArquivo;
+	string fileName = "disciplinas";
 
 	Graph graph;
-	lerArquivo(nomeArquivo, graph);
+	lerArquivo(fileName, graph);
 
 	graph.verifyConflicts();
-	graph.printConflicts();
+	graph.adjacencyListGenerator();
+	graph.convertAdjacencyList();
 
+	vi color = graph.coloringHeuristic();
+
+	for (int i = 0; i < color.size(); i++) {
+		cout << graph.searchClassByIndex(i).code.disciplina << "-" << graph.searchClassByIndex(i).code.turma << ":" << color[i] << endl;
+	}
+	
 	return 0;
 }
