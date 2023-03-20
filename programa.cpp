@@ -130,7 +130,7 @@ class Graph {
 		void verifyConflicts() {
 			groupClassByCode();
 
-			// Vértices que possuem a mesma disciplina
+			// Turmas que possuem a mesma disciplina (externo)
 			for (int i = 0; i < C.size(); i++) {
 				for (int j = 0; (j < C.size()) and (j != i); j++) {
 					if (C[i].codigo.disciplina == C[j].codigo.disciplina) {
@@ -144,12 +144,40 @@ class Graph {
 				}
 			}
 
-			// Vértices que possuem o mesmo código(disciplina e turma)
+			// Turmas que possuem o mesmo código(disciplina e turma) (interno)
 			for (int i = 0; i < C.size(); i++) {
 				for (int j = 0; j < C[i].T.size(); j++) {
 					for (int m = 0; (m < C[i].T.size()) and (m != j); m++) {
 						addEdge(*C[i].T[j], *C[i].T[m]);
 						//addEdge(*C[i].T[m], *C[i].T[j]);
+					}
+				}
+			}
+
+			// Turmas que possuem conflito de horários
+			for (int i = 0; i < C.size(); i++) {
+				for (int j = 0; (j < C.size()) and (j != i); j++) {
+					bool conflict = false;
+					for (int m = 0; m < C[i].T.size(); m++) {
+						for (int n = 0; n < C[j].T.size(); n++) {
+							if (C[i].T[m]->dia == C[j].T[n]->dia) {
+								if ((C[i].T[m]->inicio < C[j].T[n]->inicio) and (C[i].T[m]->fim > C[j].T[n]->inicio)) {
+									conflict = true;
+								} else if ((C[i].T[m]->inicio < C[j].T[n]->fim) and (C[i].T[m]->fim > C[j].T[n]->fim)) {
+									conflict = true;
+								} else if ((C[i].T[m]->inicio > C[j].T[n]->inicio) and (C[i].T[m]->fim < C[j].T[n]->fim)) {
+									conflict = true;
+								}
+							}
+						}
+					}
+					if (conflict) {
+						for (int m = 0; m < C[i].T.size(); m++) {
+							for (int n = 0; n < C[j].T.size(); n++) {
+								addEdge(*C[i].T[m], *C[j].T[n]);
+								//addEdge(*C[j].T[m], *C[i].T[n]);
+							}
+						}
 					}
 				}
 			}
@@ -161,6 +189,7 @@ class Graph {
 				cout << "(" << E[i].destino->codigo.disciplina << "," << E[i].destino->codigo.turma << ")" << E[i].destino->inicio << endl;
 			}
 		}
+
 };
 
 void lerArquivo(string nomeArquivo, Graph &graph) {
