@@ -190,23 +190,28 @@ class Graph {
 			for (int i = 0; i < C.size(); i++) {
 				for (int j = 0; (j < C.size()) and (i != j); j++) {
 					bool conflict = false;
+					/*
 					if (C[i].code.disciplina == C[j].code.disciplina) {
 						conflict = true;
 					} else {
-						for (int m = 0; m < C[i].T.size(); m++) {
-							for (int n = 0; n < C[j].T.size(); n++) {
-								if (C[i].T[m]->dia == C[j].T[n]->dia) {
-									if ((C[i].T[m]->inicio <= C[j].T[n]->inicio) and (C[i].T[m]->fim >= C[j].T[n]->inicio)) {
-										conflict = true;
-									} else if ((C[i].T[m]->inicio <= C[j].T[n]->fim) and (C[i].T[m]->fim >= C[j].T[n]->fim)) {
-										conflict = true;
-									} else if ((C[i].T[m]->inicio >= C[j].T[n]->inicio) and (C[i].T[m]->fim <= C[j].T[n]->fim)) {
-										conflict = true;
-									}
+						[...]
+					*/
+					for (int m = 0; m < C[i].T.size(); m++) {
+						for (int n = 0; n < C[j].T.size(); n++) {
+							if (C[i].T[m]->dia == C[j].T[n]->dia) {
+								if ((C[i].T[m]->inicio <= C[j].T[n]->inicio) and (C[i].T[m]->fim >= C[j].T[n]->inicio)) {
+									conflict = true;
+								} else if ((C[i].T[m]->inicio <= C[j].T[n]->fim) and (C[i].T[m]->fim >= C[j].T[n]->fim)) {
+									conflict = true;
+								} else if ((C[i].T[m]->inicio >= C[j].T[n]->inicio) and (C[i].T[m]->fim <= C[j].T[n]->fim)) {
+									conflict = true;
 								}
 							}
 						}
 					}
+					/*
+					}
+					*/
 					if (conflict) {
 						for (int m = 0; m < C[i].T.size(); m++) {
 							for (int n = 0; n < C[j].T.size(); n++) {
@@ -280,7 +285,7 @@ class Graph {
 		int degree(int u) {
 			return ALi[u].size();
 		}
-
+		
 		vi sortNodesByDregree() {
 			vii aux;
 			for (int i = 0; i < ALi.size(); i++) {
@@ -292,10 +297,11 @@ class Graph {
 				int v = aux[i].first;
 				L.push_back(v);
 			}
+			
 			return L;
 		}
 
-		vi coloringHeuristic(vector<Code> priority) {
+		vi coloringHeuristic(vector<Code> priority, string turma) {
 			adjacencyListGenerator();
 			convertAdjacencyList();
 			// Seja L uma lista de vértices ordenada de forma descendente pelo grau;
@@ -303,8 +309,13 @@ class Graph {
 			for (int i = 0; i < priority.size(); i++) {
 				L.insert(L.begin(), searchALIndexByCode(priority[i])); // front insert
 			}
+			for (int i = 0; i < C.size(); i++) {
+				if (C[i].code.turma == turma)
+					L.insert(L.begin(), searchALIndexByCode(C[i].code));
+			}
 			// c ← 1;
 			int c = 1;
+			int def = c;
 			vi color(ALi.size(), -1);
 			
 			// while L ≠ ∅ do
@@ -313,16 +324,31 @@ class Graph {
 				for (int i = 0; i < L.size(); i++) {
 					bool colored = false;
 					int v = L[i];
-					// if nenhum vértice adjacente a v foi colorido com c then
+					// if nenhum vértice adjacente a v foi colorido com a cor padrão(def) then
 					for (int j = 0; j < ALi[v].size(); j++) {
 						int u = ALi[v][j];
-						if (color[u] == c) {
+						if (color[u] == def) {
 							colored = true;
 						}
 					}
-					if (!colored) {
+					if (colored) {
+						colored = false;
+						// if nenhum vértice adjacente a v foi colorido com c then
+						for (int j = 0; j < ALi[v].size(); j++) {
+							int u = ALi[v][j];
+							if (color[u] == c) {
+								colored = true;
+							}
+						}
+						if (!colored) {
+							// Colora v com a color c;
+							color[v] = c;
+							L.erase(L.begin()+i);
+							i--;
+						}
+					} else {
 						// Colora v com a color c;
-						color[v] = c;
+						color[v] = def;
 						L.erase(L.begin()+i);
 						i--;
 					}
@@ -381,20 +407,26 @@ int main() {
 	graph.findConflicts();
 	//graph.printConflicts();
 	int d;
+	cout << "Número de disciplinas prioritárias: ";
 	cin >> d;
 	vector<Code> priority;
-	for (int i = 0; i < d; i++) {
-		cout << "Disciplina Prioritária (DISCIPLINA TURMA): ";
-		string disciplina, turma;
-		cin >> disciplina;
-		cin >> turma;
-		priority.push_back(Code(disciplina, turma));
+	if (d > 0) {
+		cout << "[Disciplina Prioritária (DISCIPLINA TURMA)]" << endl;
+		for (int i = 0; i < d; i++) {
+			string disciplina, turma;
+			cin >> disciplina;
+			cin >> turma;
+			priority.push_back(Code(disciplina, turma));
+		}
 	}
-
-	vi color = graph.coloringHeuristic(priority);
+	string turma;
+	cout << "Turma Prioritária: ";
+	cin >> turma;
+	vi color = graph.coloringHeuristic(priority, turma);
 
 	for (int i = 0; i < color.size(); i++) {
-		cout << graph.searchClassByIndex(i).code.disciplina << "-" << graph.searchClassByIndex(i).code.turma << ":" << color[i] << endl;
+		if (color[i] == 1)
+			cout << graph.searchClassByIndex(i).code.disciplina << "-" << graph.searchClassByIndex(i).code.turma << endl;
 	}
 
 	//graph.printAL();
