@@ -1,6 +1,6 @@
 # Matrícula
 
-Sistema de Matrícula Automático para seleção de disciplinas com maior aproveitamento.
+Sistema de construção de horário de matrícula automático para seleção de disciplinas com maior aproveitamento.
 
 Dado um conjunto de turmas $C$, pretendemos encontrar o melhor conjunto de turmas $T \subseteq C$ que maximize $|T|$, considerando os conflitos
 - **Código:** Seja $u,v \in C$, se $u.código$ é igual à $v.código$, então existe um conflito entre $u$ e $v$.
@@ -14,6 +14,7 @@ então existe um conflito entre $u$ e $v$.
 
 ## Entrada
 A entrada é realizada através do arquivo `disciplinas.txt`, onde é necessário inserir o conjunto de turmas $C = (Disciplina,Turma,Nome,Dia,Início,Fim)$.
+
 *Observação:* É imprescindível a conversão do horário para minutos e acrescimo de disciplinas que possuem aula em mais de um dia da semana, por exemplo:
 
 ```
