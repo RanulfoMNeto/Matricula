@@ -300,7 +300,6 @@ class Graph {
 			convertAdjacencyList();
 			// Seja L uma lista de vértices ordenada de forma descendente pelo grau;
 			vi L = sortNodesByDregree();
-			
 			// c ← 1;
 			int c = 1;
 			vi color(ALi.size(), -1);
@@ -311,19 +310,16 @@ class Graph {
 				for (int i = 0; i < L.size(); i++) {
 					bool colored = false;
 					int v = L[i];
+					// if nenhum vértice adjacente a v foi colorido com c then
 					for (int j = 0; j < ALi[v].size(); j++) {
 						int u = ALi[v][j];
-						colored = (color[u] == c)?true:false;
+						if (color[u] == c) {
+							colored = true;
+						}
 					}
-					// if nenhum vértice adjacente a v foi colorido com c then
 					if (!colored) {
 						// Colora v com a color c;
 						color[v] = c;
-					}
-				}
-				for (int i = 0; i < L.size(); i++) {
-					int v = L[i];
-					if (color[v] != -1) {
 						L.erase(L.begin()+i);
 						i--;
 					}
@@ -332,15 +328,6 @@ class Graph {
 				c++;
 			}
 			return color;
-		}
-
-		void printClass() {
-			for (int i = 0; i < C.size(); i++) {
-				cout << endl << C[i].code.disciplina << "-" << C[i].code.turma << endl << endl;
-				for (int j = 0; j < C[i].T.size(); j++) {
-					cout << C[i].T[j]->code.disciplina << endl;
-				}
-			}
 		}
 
 };
@@ -389,7 +376,6 @@ int main() {
 	lerArquivo(fileName, graph);
 
 	graph.findConflicts();
-	graph.printClass();
 	graph.printConflicts();
 
 	vi color = graph.coloringHeuristic();
