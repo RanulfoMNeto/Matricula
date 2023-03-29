@@ -96,6 +96,7 @@ class Class {
 			T.push_back(&node);
 		}
 };
+
 typedef vector<Code> vc;
 typedef pair<Code,vc> cvc;
 typedef vector<cvc> vcvc;
@@ -162,67 +163,67 @@ class Graph {
 			}
 		}
 
-		void verifyConflicts() {
+		void findConflicts() {
 			groupClassByCode();
 
-			// Turmas que possuem a mesma disciplina (externo)
+			/*
+			// Conflito de disciplinas (disciplina com turmas iguais)
 			for (int i = 0; i < C.size(); i++) {
-				for (int j = 0; (j < C.size()) and (j != i); j++) {
-					if (C[i].code.disciplina == C[j].code.disciplina) {
-						for (int m = 0; m < C[i].T.size(); m++) {
-							for (int n = 0; n < C[j].T.size(); n++) {
-								try {
-									searchEdgeByCode(C[i].code, C[j].code);
-								} catch (EdgeNotFound enf) {
-									try {
-										searchEdgeByCode(C[j].code, C[i].code);
-									} catch (EdgeNotFound enf) {
-										addEdge(*C[i].T[m], *C[j].T[n]);
-										addEdge(*C[j].T[n], *C[i].T[m]);
-									}
-								}
+				for (int m = 0; m < C[i].T.size(); m++) {
+					for (int n = 0; (n < C[i].T.size()) and (m != n); n++) {
+						try {
+							searchEdgeByCode(C[i].T[m]->code, C[i].T[n]->code);
+						} catch (EdgeNotFound enf) {
+							try {
+								searchEdgeByCode(C[i].T[n]->code, C[i].T[m]->code);
+							} catch (EdgeNotFound enf) {
+								addEdge(*C[i].T[m], *C[i].T[n]);
+								addEdge(*C[i].T[n], *C[i].T[m]);
 							}
 						}
 					}
 				}
 			}
+			*/
 
 			// Turmas que possuem conflito de horários
 			for (int i = 0; i < C.size(); i++) {
-				for (int j = 0; (j < C.size()) and (j != i); j++) {
+				for (int j = 0; (j < C.size()) and (i != j); j++) {
 					bool conflict = false;
-					for (int m = 0; m < C[i].T.size(); m++) {
-						for (int n = 0; n < C[j].T.size(); n++) {
-							if (C[i].T[m]->dia == C[j].T[n]->dia) {
-								if ((C[i].T[m]->inicio < C[j].T[n]->inicio) and (C[i].T[m]->fim > C[j].T[n]->inicio)) {
-									conflict = true;
-								} else if ((C[i].T[m]->inicio < C[j].T[n]->fim) and (C[i].T[m]->fim > C[j].T[n]->fim)) {
-									conflict = true;
-								} else if ((C[i].T[m]->inicio > C[j].T[n]->inicio) and (C[i].T[m]->fim < C[j].T[n]->fim)) {
-									conflict = true;
+					if (C[i].code.disciplina == C[j].code.disciplina) {
+						conflict = true;
+					} else {
+						for (int m = 0; m < C[i].T.size(); m++) {
+							for (int n = 0; n < C[j].T.size(); n++) {
+								if (C[i].T[m]->dia == C[j].T[n]->dia) {
+									if ((C[i].T[m]->inicio <= C[j].T[n]->inicio) and (C[i].T[m]->fim >= C[j].T[n]->inicio)) {
+										conflict = true;
+									} else if ((C[i].T[m]->inicio <= C[j].T[n]->fim) and (C[i].T[m]->fim >= C[j].T[n]->fim)) {
+										conflict = true;
+									} else if ((C[i].T[m]->inicio >= C[j].T[n]->inicio) and (C[i].T[m]->fim <= C[j].T[n]->fim)) {
+										conflict = true;
+									}
 								}
 							}
 						}
 					}
 					if (conflict) {
-						try {
-							searchEdgeByCode(C[i].code, C[j].code);
-						} catch (EdgeNotFound enf) {
-							try {
-								searchEdgeByCode(C[j].code, C[i].code);
-							} catch (EdgeNotFound enf) {
-								for (int m = 0; m < C[i].T.size(); m++) {
-									for (int n = 0; n < C[j].T.size(); n++) {
+						for (int m = 0; m < C[i].T.size(); m++) {
+							for (int n = 0; n < C[j].T.size(); n++) {
+								try {
+									searchEdgeByCode(C[i].code, C[j].code);
+									searchEdgeByCode(C[j].code, C[i].code);
+								} catch (EdgeNotFound enf) {
+									
 										addEdge(*C[i].T[m], *C[j].T[n]);
 										addEdge(*C[j].T[n], *C[i].T[m]);
-									}
 								}
 							}
-							
 						}
 					}
 				}
 			}
+
 		}
 
 		void printConflicts() {
@@ -232,18 +233,18 @@ class Graph {
 			}
 		}
 
-		cvc& searchALByCode(Code code) {
-			for (int i = 0; i < AL.size(); i++) {
-				if (AL[i].first == code)
-					return AL[i];
-			}
-			throw CodeNotFound();
-		}
-
 		int searchALIndexByCode(Code code) {
 			for (int i = 0; i < AL.size(); i++) {
 				if (AL[i].first == code)
 					return i;
+			}
+			throw CodeNotFound();
+		}
+
+		cvc& searchALByCode(Code code) {
+			for (int i = 0; i < AL.size(); i++) {
+				if (AL[i].first == code)
+					return AL[i];
 			}
 			throw CodeNotFound();
 		}
@@ -255,6 +256,15 @@ class Graph {
 
 			for (int i = 0; i < E.size(); i++) {
 				searchALByCode(E[i].origem->code).second.push_back(E[i].destino->code);
+			}
+		}
+
+		void printAL() {
+			for (int i = 0; i < AL.size(); i++) {
+				cout << endl << "[" << AL[i].first.disciplina << "-" << AL[i].first.turma << "]" << endl;
+				for (int j = 0; j < AL[i].second.size(); j++) {
+					cout << "    " << AL[i].second[j].disciplina << "-" << AL[i].second[j].turma << ";" << endl;
+				}
 			}
 		}
 
@@ -286,6 +296,8 @@ class Graph {
 		}
 
 		vi coloringHeuristic() {
+			adjacencyListGenerator();
+			convertAdjacencyList();
 			// Seja L uma lista de vértices ordenada de forma descendente pelo grau;
 			vi L = sortNodesByDregree();
 			
@@ -321,6 +333,16 @@ class Graph {
 			}
 			return color;
 		}
+
+		void printClass() {
+			for (int i = 0; i < C.size(); i++) {
+				cout << endl << C[i].code.disciplina << "-" << C[i].code.turma << endl << endl;
+				for (int j = 0; j < C[i].T.size(); j++) {
+					cout << C[i].T[j]->code.disciplina << endl;
+				}
+			}
+		}
+
 };
 
 void lerArquivo(string fileName, Graph &graph) {
@@ -366,15 +388,17 @@ int main() {
 	Graph graph;
 	lerArquivo(fileName, graph);
 
-	graph.verifyConflicts();
-	graph.adjacencyListGenerator();
-	graph.convertAdjacencyList();
+	graph.findConflicts();
+	graph.printClass();
+	graph.printConflicts();
 
 	vi color = graph.coloringHeuristic();
 
 	for (int i = 0; i < color.size(); i++) {
 		cout << graph.searchClassByIndex(i).code.disciplina << "-" << graph.searchClassByIndex(i).code.turma << ":" << color[i] << endl;
 	}
+
+	graph.printAL();
 	
 	return 0;
 }
