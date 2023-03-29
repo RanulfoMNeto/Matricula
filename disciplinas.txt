@@ -1,10 +1,35 @@
 Disciplina,Turma,Nome,Dia,Início,Fim
-GAC108,10A,Estruturas de Dados,Terça-Feira,50,200
-GAC108,19A,Estruturas de Dados,Quarta-Feira,300,450
-GES101,15B,Estatística,Segunda-Feira,30,180
-GES101,10B,Estatística,Segunda-Feira,10,160
-GES101,10B,Estatística,Sexta-Feira,250,400
-GES101,15B,Estatística,Sexta-Feira,250,400
-GDI116,12B,Direito Penal,Quarta-Feira,200,350
-GCC130,10A,Compiladores,Quinta-Feira,20,300
-GCC130,10A,Compiladores,Sexta-Feira,300,450
+GAC106,10A,Práticas de Programação Orientada a Objetos,Segunda-Feira,780,880
+GAC106,10A,Práticas de Programação Orientada a Objetos,Quarta-Feira,480,580
+GAC106,10B,Práticas de Programação Orientada a Objetos,Segunda-Feira,780,880
+GAC106,10B,Práticas de Programação Orientada a Objetos,Quarta-Feira,600,700
+GAC106,14A,Práticas de Programação Orientada a Objetos,Terça-Feira,1260,1360
+GAC106,14A,Práticas de Programação Orientada a Objetos,Quinta-Feira,1020,1120
+GAC106,14B,Práticas de Programação Orientada a Objetos,Terça-Feira,1260,1360
+GAC106,14B,Práticas de Programação Orientada a Objetos,Quarta-Feira,1020,1120
+GAC106,14W,Práticas de Programação Orientada a Objetos,Terça-Feira,1260,1360
+GAC106,14W,Práticas de Programação Orientada a Objetos,Quinta-Feira,1140,1240
+GCC108,10A,Teoria da Computação,Terça-Feira,780,880
+GCC108,10A,Teoria da Computação,Quarta-Feira,780,880
+GCC108,14A,Teoria da Computação,Terça-Feira,1140,1240
+GCC108,14A,Teoria da Computação,Quarta-Feira,1140,1240
+GCC116,10A,Sistemas Operacionais,Terça-Feira,1020,1120
+GCC116,10A,Sistemas Operacionais,Quinta-Feira,1020,1120
+GCC116,14A,Sistemas Operacionais,Terça-Feira,1260,1360
+GCC116,14A,Sistemas Operacionais,Quinta-Feira,1140,1240
+GCC116,22A,Sistemas Operacionais,Terça-Feira,1020,1120
+GCC116,22A,Sistemas Operacionais,Quinta-Feira,1020,1120
+GCC123,10A,Arquitetura de Computadores,Segunda-Feira,900,1000
+GCC123,10A,Arquitetura de Computadores,Quarta-Feira,900,1000
+GCC123,22A,Arquitetura de Computadores,Segunda-Feira,900,1000
+GCC123,22A,Arquitetura de Computadores,Quarta-Feira,900,1000
+GCC175,10A,Sistemas Gerenciadores de Banco de Dados,Quinta-Feira,900,1000
+GCC175,10A,Sistemas Gerenciadores de Banco de Dados,Sexta-Feira,900,1000
+GCC175,14A,Sistemas Gerenciadores de Banco de Dados,Quinta-Feira,1260,1360
+GCC175,14A,Sistemas Gerenciadores de Banco de Dados,Sexta-Feira,1140,1240
+GCC188,10A,Engenharia de Software,Terça-Feira,900,1000
+GCC188,10A,Engenharia de Software,Sexta-Feira,780,880
+GCC188,14A,Engenharia de Software,Segunda-Feira,1020,1120
+GCC188,14A,Engenharia de Software,Quarta-Feira,1020,1120
+GMM133,15A,Análise Combinatória e Probabilidade,Terça-Feira,1140,1240
+GMM133,15A,Análise Combinatória e Probabilidade,Quinta-Feira,1260,1360
