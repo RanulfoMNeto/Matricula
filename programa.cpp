@@ -295,11 +295,14 @@ class Graph {
 			return L;
 		}
 
-		vi coloringHeuristic() {
+		vi coloringHeuristic(vector<Code> priority) {
 			adjacencyListGenerator();
 			convertAdjacencyList();
 			// Seja L uma lista de vértices ordenada de forma descendente pelo grau;
 			vi L = sortNodesByDregree();
+			for (int i = 0; i < priority.size(); i++) {
+				L.insert(L.begin(), searchALIndexByCode(priority[i])); // front insert
+			}
 			// c ← 1;
 			int c = 1;
 			vi color(ALi.size(), -1);
@@ -376,15 +379,25 @@ int main() {
 	lerArquivo(fileName, graph);
 
 	graph.findConflicts();
-	graph.printConflicts();
+	//graph.printConflicts();
+	int d;
+	cin >> d;
+	vector<Code> priority;
+	for (int i = 0; i < d; i++) {
+		cout << "Disciplina Prioritária (DISCIPLINA TURMA): ";
+		string disciplina, turma;
+		cin >> disciplina;
+		cin >> turma;
+		priority.push_back(Code(disciplina, turma));
+	}
 
-	vi color = graph.coloringHeuristic();
+	vi color = graph.coloringHeuristic(priority);
 
 	for (int i = 0; i < color.size(); i++) {
 		cout << graph.searchClassByIndex(i).code.disciplina << "-" << graph.searchClassByIndex(i).code.turma << ":" << color[i] << endl;
 	}
 
-	graph.printAL();
+	//graph.printAL();
 	
 	return 0;
 }
